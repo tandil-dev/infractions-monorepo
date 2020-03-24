@@ -1,0 +1,16 @@
+{
+  "name": "infractions",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "packages/boilerplate1"
+    ],
+    "nohoist": ["packages/ignorar"]
+  },
+  "version": "1.0.0",
+  "description": "infraction system",
+  "main": "index.js",
+  "repository": "https://github.com/tandil-dev/infractions_monorepo.git",
+  "author": "tandil-dev",
+  "license": "MIT"
+}
