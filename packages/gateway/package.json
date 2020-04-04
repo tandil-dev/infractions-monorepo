@@ -1,0 +1,18 @@
+{
+  "name": "federation-demo",
+  "main": "src/index.js",
+  "version": "0.1.0",
+  "scripts": {
+    "start-gateway": "nodemon ./src/index.js",
+    "start-services": "concurrently \"npm:start-service-*\""
+  },
+  "devDependencies": {
+    "nodemon": "latest",
+    "concurrently": "latest"
+  },
+  "dependencies": {
+    "@apollo/gateway": "latest",
+    "apollo-server": "latest",
+    "graphql": "latest"
+  }
+}

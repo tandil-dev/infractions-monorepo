@@ -1,16 +1,28 @@
 {
   "name": "infractions",
   "private": true,
+  "scripts": {
+    "start-gateway": "nodemon ./packages/gateway/src/index.js",
+    "start-service-users": "nodemon ./packages/service_users/src/index.js",
+    "start-services": "concurrently \"npm:start-service-*\""
+  },
   "workspaces": {
     "packages": [
-      "packages/boilerplate1"
+      "packages/gateway",
+      "packages/service_users"
     ],
-    "nohoist": ["packages/ignorar"]
+    "nohoist": [
+      "packages/ignorar"
+    ]
   },
   "version": "1.0.0",
   "description": "infraction system",
   "main": "index.js",
   "repository": "https://github.com/tandil-dev/infractions_monorepo.git",
   "author": "tandil-dev",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "latest",
+    "concurrently": "latest"
+  }
 }

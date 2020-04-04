@@ -1,0 +1,21 @@
+{
+  "name": "service-users",
+  "main": "src/index.js",
+  "version": "0.1.0",
+  "scripts": {
+    "start": "node ./src/index.js",
+    "start-services": "concurrently \"npm:start-service-*\"",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "concurrently": "latest",
+    "jest": "^25.2.7",
+    "nodemon": "latest"
+  },
+  "dependencies": {
+    "@apollo/federation": "latest",
+    "@apollo/gateway": "latest",
+    "apollo-server": "latest",
+    "graphql": "latest"
+  }
+}
