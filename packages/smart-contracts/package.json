@@ -1,0 +1,33 @@
+{
+  "name": "smart-contracts",
+  "version": "0.0.1",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "(ganache-cli > /dev/null & truffle test) && kill -9 $(lsof -ti :8545)"
+  },
+  "keywords": [
+    "Solidity"
+  ],
+  "author": "Matías Oveja Smith <matias.ovejasmith@gmail.com>",
+  "license": "SEE LICENSE IN LICENSE",
+  "dependencies": {
+    "@openzeppelin/contracts": "3.0.0-rc.1",
+    "@openzeppelin/test-helpers": "^0.5.5",
+    "@truffle/hdwallet-provider": "^1.0.34",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "2.20.2"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-truffle": "^0.3.1"
+  }
+}
