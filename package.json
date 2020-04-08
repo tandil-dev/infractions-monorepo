@@ -8,6 +8,7 @@
   },
   "workspaces": {
     "packages": [
+      "packages/smart-contracts",
       "packages/gateway",
       "packages/service_users"
     ],

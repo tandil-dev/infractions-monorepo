@@ -16,21 +16,21 @@ contract('Infractions - Ownable and Access control', ([owner, admin, inspector, 
 
   it('Owner should be DEFAULT_ADMIN_ROLE', async () => {
     const hasAdminRole = await infraction.hasRole(DEFAULT_ADMIN_ROLE, owner);
-    assert.equal(hasRole, true);
+    assert.equal(hasAdminRole, true);
   });
   it('Owner should be able to grant DEFAULT_ADMIN_ROLE', async () => {
     await infraction.grantRole(DEFAULT_ADMIN_ROLE, admin);
     const hasAdminRole = await infraction.hasRole(DEFAULT_ADMIN_ROLE, admin);
-    assert.equal(hasRole, true);
+    assert.equal(hasAdminRole, true);
   });
 
   it('DEFAULT_ADMIN_ROLE should able to grant INSPECTOR_ROLE', async () => {
     await infraction.grantRole(DEFAULT_ADMIN_ROLE, admin);
     const hasAdminRole = await infraction.hasRole(DEFAULT_ADMIN_ROLE, admin);
-    assert.equal(hasRole, true);
+    assert.equal(hasAdminRole, true);
     await infraction.grantRole(INSPECTOR_ROLE, inspector);
     const hasInspectoRole = await infraction.hasRole(INSPECTOR_ROLE, inspector);
-    assert.equal(hasRole, true);
+    assert.equal(hasInspectoRole, true);
   });
   it('Inspector should not be DEFAULT_ADMIN_ROLE', async () => {
     const hasRole = await infraction.hasRole(DEFAULT_ADMIN_ROLE, inspector);
