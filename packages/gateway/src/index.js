@@ -1,5 +1,8 @@
 const { ApolloServer } = require("apollo-server");
-const { ApolloGateway } = require("@apollo/gateway");
+const { ApolloGateway, RemoteGraphQLDataSource } = require("@apollo/gateway");
+const jwt = require("jsonwebtoken");
+
+const SECRET_KEY = process.env.secret || "SECRET_KEY";
 
 const gateway = new ApolloGateway({
   // This entire `serviceList` is optional when running in managed federation
@@ -13,6 +16,17 @@ const gateway = new ApolloGateway({
     // { name: "products", url: "http://localhost:4003/graphql" },
     // { name: "inventory", url: "http://localhost:4004/graphql" }
   ],
+  buildService({ name, url }) {
+    return new RemoteGraphQLDataSource({
+      url,
+      willSendRequest({ request, context }) {
+        request.http.headers.set(
+          "x-user-data",
+          JSON.stringify((context && context.userData) || {})
+        );
+      },
+    });
+  },
 
   // Experimental: Enabling this enables the query plan view in Playground.
   __exposeQueryPlanExperimental: false,
@@ -29,6 +43,21 @@ const gateway = new ApolloGateway({
 
     // Subscriptions are unsupported but planned for a future Gateway version.
     subscriptions: false,
+    context: ({ req }) => {
+      // get the user token from the headers
+      const context = {};
+      const token = req.headers.authorization || "";
+      context.token = token;
+      if (token) {
+        try {
+          const userData = jwt.verify(token, SECRET_KEY);
+          context.userData = userData;
+        } catch (e) {
+          console.log("invalid TOKEN");
+        }
+      }
+      return context;
+    },
   });
 
   server.listen().then(({ url }) => {

@@ -7,12 +7,13 @@
     "start-services": "concurrently \"npm:start-service-*\""
   },
   "devDependencies": {
-    "nodemon": "latest",
-    "concurrently": "latest"
+    "concurrently": "latest",
+    "nodemon": "latest"
   },
   "dependencies": {
     "@apollo/gateway": "latest",
     "apollo-server": "latest",
-    "graphql": "latest"
+    "graphql": "latest",
+    "jsonwebtoken": "^8.5.1"
   }
 }

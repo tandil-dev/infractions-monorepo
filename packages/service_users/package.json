@@ -16,6 +16,8 @@
     "@apollo/federation": "latest",
     "@apollo/gateway": "latest",
     "apollo-server": "latest",
-    "graphql": "latest"
+    "graphql": "latest",
+    "jsonwebtoken": "^8.5.1",
+    "uuid": "^7.0.3"
   }
 }
