@@ -1,5 +1,7 @@
-const Infractions = artifacts.require("Infractions");
+const InfractionFactory = artifacts.require('InfractionFactory');
+const Infraction = artifacts.require('Infraction');
 
 module.exports = function deployContracts(deployer) {
-  deployer.deploy(Infractions);
+  deployer.deploy(InfractionFactory);
+  deployer.deploy(Infraction);
 };
