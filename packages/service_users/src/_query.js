@@ -22,9 +22,16 @@ const typeDefs = gql`
   }
 `;
 
+const verifyPermissions = (userData) => {
+  if(!userData.id) throw new Error("no user Data!")
+}
+
 const resolvers = {
   Query: {
-    me: () => users[0],
+    me: (parent, params, context) => {
+      verifyPermissions(context.userData)
+      return users[0]
+    },
   },
 };
 

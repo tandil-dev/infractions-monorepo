@@ -13,6 +13,7 @@
   "dependencies": {
     "@apollo/gateway": "latest",
     "apollo-server": "latest",
+    "ethers": "^4.0.46",
     "graphql": "latest",
     "jsonwebtoken": "^8.5.1"
   }
