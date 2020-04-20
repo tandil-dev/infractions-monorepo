@@ -15,6 +15,7 @@
     "apollo-server": "latest",
     "ethers": "^4.0.46",
     "graphql": "latest",
-    "jsonwebtoken": "^8.5.1"
+    "jsonwebtoken": "^8.5.1",
+    "jose": "^1.26.0"
   }
 }
