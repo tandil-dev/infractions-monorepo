@@ -6,6 +6,9 @@ const typeDefs = gql`
     name: String
     username: String
   }
+  type Token @key(fields:"token"){
+    token: String
+  }
 `;
 
 const resolvers = {
