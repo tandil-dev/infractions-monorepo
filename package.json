@@ -25,5 +25,13 @@
   "devDependencies": {
     "nodemon": "latest",
     "concurrently": "latest"
+  },
+  "dependencies": {
+    "@apollo/federation": "^0.14.1",
+    "@apollo/gateway": "^0.14.1",
+    "apollo-server": "^2.12.0",
+    "ethers": "^4.0.46",
+    "gateway": "^1.0.0",
+    "jose": "^1.26.0"
   }
 }

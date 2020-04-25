@@ -1,6 +1,6 @@
 const { ApolloServer } = require("apollo-server");
 const { ApolloGateway, RemoteGraphQLDataSource } = require("@apollo/gateway");
-const jwt = require("jsonwebtoken");
+const { decodeToken } = require('./decodeToken');
 
 const SECRET_KEY = process.env.secret || "SECRET_KEY";
 
@@ -20,6 +20,7 @@ const gateway = new ApolloGateway({
     return new RemoteGraphQLDataSource({
       url,
       willSendRequest({ request, context }) {
+                
         request.http.headers.set(
           "x-user-data",
           JSON.stringify((context && context.userData) || {})
@@ -31,6 +32,7 @@ const gateway = new ApolloGateway({
   // Experimental: Enabling this enables the query plan view in Playground.
   __exposeQueryPlanExperimental: false,
 });
+
 
 (async () => {
   const server = new ApolloServer({
@@ -44,14 +46,15 @@ const gateway = new ApolloGateway({
     // Subscriptions are unsupported but planned for a future Gateway version.
     subscriptions: false,
     context: ({ req }) => {
+
       // get the user token from the headers
       const context = {};
       const token = req.headers.authorization || "";
       context.token = token;
       if (token) {
         try {
-          const userData = jwt.verify(token, SECRET_KEY);
-          context.userData = userData;
+          const { header, payload, signature, signingAddress } = decodeToken(token);
+          context.userData = { payload, signature, signingAddress };
         } catch (e) {
           console.log("invalid TOKEN");
         }
@@ -60,7 +63,9 @@ const gateway = new ApolloGateway({
     },
   });
 
-  server.listen().then(({ url }) => {
+  server.listen({port: 4011}).then(({ url }) => {
     console.log(`🚀 Server ready at ${url}`);
   });
 })();
+
+
