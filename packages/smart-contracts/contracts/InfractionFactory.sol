@@ -10,7 +10,7 @@ contract InfractionFactory is Ownable, AccessControl {
 
     bytes32 public constant INSPECTOR_ROLE = keccak256("INSPECTOR_ROLE");
 
-    event infractionCreated(address infractionAddress);
+    event infractionCreated(address infractionAddress, address createdBy);
 
     constructor() public Ownable() {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
@@ -23,7 +23,7 @@ contract InfractionFactory is Ownable, AccessControl {
         userInfractions.push(i);
 
         amountOfInfractionsByUser[_msgSender()] = userInfractions.length;
-        emit infractionCreated(address(i));
+        emit infractionCreated(address(i), _msgSender());
     }
 
     function getAmountOfInfractionByUser(address _userAddress) public view returns(uint) {

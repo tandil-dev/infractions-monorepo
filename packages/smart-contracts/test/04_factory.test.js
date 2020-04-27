@@ -21,7 +21,7 @@ contract('infractionFactory', ([owner, other, ...accounts]) => {
     it('Create infractions', async () => {
       const r = await infractionFactory.createInfraction();
       const address = r.logs[0];
-      expectEvent(r, 'infractionCreated');
+      expectEvent(r, 'infractionCreated', { createdBy: owner });
       assert.notEqual(address, '');
       assert.notEqual(address, 0x0);
       assert.notEqual(address, null);
