@@ -1,12 +1,12 @@
 /* eslint-env node, mocha */
-const InfractionFactory = artifacts.require('./InfractionFactory.sol');
+const InfractionFactory = artifacts.require('InfractionFactory');
 
 require('chai')
   .use(require('chai-as-promised'))
   .should();
 
 // eslint-disable-next-line no-unused-vars
-contract('Infractions - Ownable and Access control', ([owner, admin, inspector, ...accounts]) => {
+contract('Infraction Factory - Ownable and Access control', ([owner, admin, inspector, ...accounts]) => {
   const DEFAULT_ADMIN_ROLE = '0x00';
   const INSPECTOR_ROLE = web3.utils.keccak256('INSPECTOR_ROLE');
 

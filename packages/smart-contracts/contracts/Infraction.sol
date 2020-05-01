@@ -2,23 +2,25 @@ pragma solidity 0.6.6;
 
 contract Infraction  {
     enum Stages {
-        REVISION_COMUNITARIA,
-        REVISION_EN_DEPARTAMENTO,
-        REVISION_EN_JUZGADO,
-        APROBADA_EN_JUZGADO,
-        PAGO_VOLUNTARIO,
-        PAGO_REGULAR,
-        PAGO_REGULAR_VENCIDO,
-        PERIODO_EXTRA,
-        ABONADA,
-        RECLAMADA,
-        RECHAZADA_POR_COMUNIDAD,
-        RECHAZADA_POR_DEPARTAMENTO,
-        RECHAZADA_POR_JUZGADO,
-        RECHAZO_DEFINITIVO
+        CREATED,
+        COMMUNITY_REVIEW,
+        DEPARTMENT_REVIEW,
+        COURT_REVIEW,
+        APPROVED_BY_COURT,
+        VOLUNTARY_PAYMENT_PERIOD,
+        REGULAR_PAYMENT_PERIOD,
+        DUE_REGULAR_PAYMENT_PERIOD,
+        EXTRA_PERIOD,
+        PAID,
+        CALIMED,
+        REJECTED_BY_COMMUNITY,
+        REJECTED_BY_DEPERMENT,
+        REJECTED_BY_COURT,
+        REJECTED
     }
 
-    Stages public stage = Stages.REVISION_COMUNITARIA;
+    Stages public stage;
+    address public factory;
 
     modifier atStage(Stages _stage) {
         require(stage == _stage, 'Invalid stage');
@@ -27,134 +29,141 @@ contract Infraction  {
 
     modifier onlyRejected() {
         require(
-            stage == Stages.RECHAZADA_POR_COMUNIDAD ||
-            stage == Stages.RECHAZADA_POR_DEPARTAMENTO ||
-            stage == Stages.RECHAZADA_POR_JUZGADO,
+            stage == Stages.REJECTED_BY_COMMUNITY ||
+            stage == Stages.REJECTED_BY_DEPERMENT ||
+            stage == Stages.REJECTED_BY_COURT,
             'Only previously rejected');
         _;
     }
 
     modifier onlyIssued() {
         require(
-            stage == Stages.PAGO_VOLUNTARIO ||
-            stage == Stages.PAGO_REGULAR ||
-            stage == Stages.PAGO_REGULAR_VENCIDO ||
-            stage == Stages.PERIODO_EXTRA,
+            stage == Stages.VOLUNTARY_PAYMENT_PERIOD ||
+            stage == Stages.REGULAR_PAYMENT_PERIOD ||
+            stage == Stages.DUE_REGULAR_PAYMENT_PERIOD ||
+            stage == Stages.EXTRA_PERIOD,
             'Only issued');
         _;
     }
 
-    // REVISION_COMUNITARIA ->  REVISION_EN_DEPARTAMENTO
+    // PROOFS
+    event newProof(string url);
+
+    // CREATED -> COMMUNITY_REVIEW
+    event ready();
+
+    // COMMUNITY_REVIEW ->  DEPARTMENT_REVIEW
     event approvedByComunity();
     event rejectedByCommunity();
-    event newComunityProofs();
 
-    // REVISION_EN_DEPARTAMENTO -> REVISION_EN_JUZGADO
+    // DEPARTMENT_REVIEW -> COURT_REVIEW
     event approvedByDepartment();
     event rejectedByDepartment();
-    event newDepartmentProofs();
 
-    // REVISION_EN_JUZGADO -> APROBADA_EN_JUZGADO
+    // COURT_REVIEW -> APPROVED_BY_COURT
     event approvedByCourt();
     event rejectedByCourt();
-    event newCourtProofs();
 
-    // APROBADA_EN_JUZGADO -> PAGO_VOLUNTARIO
+    // APPROVED_BY_COURT -> VOLUNTARY_PAYMENT_PERIOD
     event volunteerPaimentPeriodEnds();
 
-    // PAGO_VOLUNTARIO -> PAGO_REGULAR
+    // VOLUNTARY_PAYMENT_PERIOD -> PAGO_REGULAR
     event regularPaimentPeriodEnds();
 
-    // PAGO_REGULAR -> PAGO_VENCIDO
+    // REGULAR_PAYMENT_PERIOD-> PAGO_VENCIDO
     event overduePaimentPeriodEnds();
 
-    // * -> ABONADA
+    // * -> PAID
     event paid();
 
-    // ABONADA -> RECLAMADA
+    // PAID -> CALIMED
     event claimed();
 
-    // * -> RECHAZO_DEFINITIVO
+    // * -> REJECTED
     event rejected();
 
-    constructor() public {
-        stage = Stages.REVISION_COMUNITARIA;
+    constructor(address _factory) public {
+        factory = _factory;
+        stage = Stages.CREATED;
     }
 
     // State Machine
 
-    function addProofs() public {
-        if (stage == Stages.RECHAZADA_POR_COMUNIDAD) {
-            emit newComunityProofs();
-            stage = Stages.REVISION_COMUNITARIA;
+    function addProof(string memory _url) public {
+        if (stage == Stages.REJECTED_BY_COMMUNITY) {
+            stage = Stages.COMMUNITY_REVIEW;
         }
-        if (stage == Stages.RECHAZADA_POR_DEPARTAMENTO) {
-            emit newDepartmentProofs();
-            stage = Stages.REVISION_EN_DEPARTAMENTO;
+        if (stage == Stages.REJECTED_BY_DEPERMENT) {
+            stage = Stages.DEPARTMENT_REVIEW;
         }
-        if (stage == Stages.RECHAZADA_POR_JUZGADO) {
-            emit newCourtProofs();
-            stage = Stages.REVISION_EN_JUZGADO;
+        if (stage == Stages.REJECTED_BY_COURT) {
+            stage = Stages.COURT_REVIEW;
         }
+        emit newProof(_url);
     }
 
-    function communityRejects() public atStage(Stages.REVISION_COMUNITARIA){
+    function setReady() public atStage(Stages.CREATED) {
+        emit ready();
+        stage = Stages.COMMUNITY_REVIEW;
+    }
+
+    function communityRejects() public atStage(Stages.COMMUNITY_REVIEW){
         emit rejectedByCommunity();
-        stage = Stages.RECHAZADA_POR_COMUNIDAD;
+        stage = Stages.REJECTED_BY_COMMUNITY;
     }
 
-    function communityApproves() public atStage(Stages.REVISION_COMUNITARIA){
+    function communityApproves() public atStage(Stages.COMMUNITY_REVIEW){
         emit approvedByComunity();
-        stage = Stages.REVISION_EN_DEPARTAMENTO;
+        stage = Stages.DEPARTMENT_REVIEW;
     }
 
-    function departamentApproves() public atStage(Stages.REVISION_EN_DEPARTAMENTO){
+    function departamentApproves() public atStage(Stages.DEPARTMENT_REVIEW){
         emit approvedByDepartment();
-        stage = Stages.REVISION_EN_JUZGADO;
+        stage = Stages.COURT_REVIEW;
     }
 
-    function departamentRejects() public atStage(Stages.REVISION_EN_DEPARTAMENTO){
+    function departamentRejects() public atStage(Stages.DEPARTMENT_REVIEW){
         emit rejectedByDepartment();
-        stage = Stages.RECHAZADA_POR_DEPARTAMENTO;
+        stage = Stages.REJECTED_BY_DEPERMENT;
     }
 
-    function courtApproves() public atStage(Stages.REVISION_EN_JUZGADO){
+    function courtApproves() public atStage(Stages.COURT_REVIEW){
         emit approvedByCourt();
-        stage = Stages.PAGO_VOLUNTARIO;
+        stage = Stages.VOLUNTARY_PAYMENT_PERIOD;
     }
 
-    function courtRejects() public atStage(Stages.REVISION_EN_JUZGADO){
+    function courtRejects() public atStage(Stages.COURT_REVIEW){
         emit rejectedByCourt();
-        stage = Stages.RECHAZADA_POR_JUZGADO;
+        stage = Stages.REJECTED_BY_COURT;
     }
 
-    function endVolunteerPayment() public atStage(Stages.PAGO_VOLUNTARIO){
+    function endVolunteerPayment() public atStage(Stages.VOLUNTARY_PAYMENT_PERIOD){
         emit volunteerPaimentPeriodEnds();
-        stage = Stages.PAGO_REGULAR;
+        stage = Stages.REGULAR_PAYMENT_PERIOD;
     }
 
-    function endRegularPayment() public atStage(Stages.PAGO_REGULAR){
+    function endRegularPayment() public atStage(Stages.REGULAR_PAYMENT_PERIOD){
         emit regularPaimentPeriodEnds();
-        stage = Stages.PAGO_REGULAR_VENCIDO;
+        stage = Stages.DUE_REGULAR_PAYMENT_PERIOD;
     }
 
-    function endOverduePayment() public atStage(Stages.PAGO_REGULAR_VENCIDO){
+    function endOverduePayment() public atStage(Stages.DUE_REGULAR_PAYMENT_PERIOD){
         emit overduePaimentPeriodEnds();
-        stage = Stages.PERIODO_EXTRA;
+        stage = Stages.EXTRA_PERIOD;
     }
 
     function setPaid() public onlyIssued() {
         emit paid();
-        stage = Stages.ABONADA;
+        stage = Stages.PAID;
     }
 
-    function setClaimed() public atStage(Stages.ABONADA){
+    function setClaimed() public atStage(Stages.PAID){
         emit claimed();
-        stage = Stages.RECLAMADA;
+        stage = Stages.CALIMED;
     }
 
     function reject() public onlyRejected() {
         emit rejected();
-        stage = Stages.RECHAZO_DEFINITIVO;
+        stage = Stages.REJECTED;
     }
 }

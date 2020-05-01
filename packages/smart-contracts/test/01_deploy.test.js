@@ -1,6 +1,7 @@
 /* eslint-env node, mocha */
-const InfractionFactory = artifacts.require('./InfractionFactory.sol');
-const Infraction = artifacts.require('./Infraction.sol');
+const InfractionFactory = artifacts.require('InfractionFactory');
+
+const { getNewInfraction } = require('./utils');
 
 require('chai')
   .use(require('chai-as-promised'))
@@ -28,7 +29,8 @@ contract('Infraction', () => {
   let infraction;
 
   before(async () => {
-    infraction = await Infraction.deployed();
+    const infractionFactory = await InfractionFactory.deployed();
+    infraction = await getNewInfraction(infractionFactory);
   });
 
   describe('Deployment', async () => {
@@ -38,6 +40,14 @@ contract('Infraction', () => {
       assert.notEqual(address, 0x0);
       assert.notEqual(address, null);
       assert.notEqual(address, undefined);
+    });
+
+    it('Should have factory address', async () => {
+      const factoryAddress = await infraction.factory();
+      assert.notEqual(factoryAddress, '');
+      assert.notEqual(factoryAddress, 0x0);
+      assert.notEqual(factoryAddress, null);
+      assert.notEqual(factoryAddress, undefined);
     });
   });
 });

@@ -16,14 +16,15 @@ contract InfractionFactory is Ownable, AccessControl {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
-    function createInfraction() public returns(address){
-        Infraction i = new Infraction();
+    function createInfraction() public returns(address newInfractionAddress) {
+        Infraction i = new Infraction(address(this));
 
         Infraction[] storage userInfractions = infractionsByUser[_msgSender()];
         userInfractions.push(i);
 
         amountOfInfractionsByUser[_msgSender()] = userInfractions.length;
         emit infractionCreated(address(i), _msgSender());
+        return address(i);
     }
 
     function getAmountOfInfractionByUser(address _userAddress) public view returns(uint) {

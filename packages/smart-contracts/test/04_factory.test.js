@@ -1,8 +1,8 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-plusplus */
 /* eslint-env node, mocha */
-const InfractionFactory = artifacts.require('./InfractionFactory.sol');
-const Infraction = artifacts.require('./Infraction.sol');
+const InfractionFactory = artifacts.require('InfractionFactory');
+const Infraction = artifacts.require('Infraction');
 const { expectEvent } = require('@openzeppelin/test-helpers');
 
 require('chai')
