@@ -1,6 +1,10 @@
 pragma solidity 0.6.6;
 
-contract Infraction  {
+import '../../../node_modules/@openzeppelin/contracts/access/Ownable.sol';
+import './RewardsTandil.sol';
+import './InfractionFactory.sol';
+
+contract Infraction {
     enum Stages {
         CREATED,
         COMMUNITY_REVIEW,
@@ -20,7 +24,8 @@ contract Infraction  {
     }
 
     Stages public stage;
-    address public factory;
+    InfractionFactory public factory;
+    RewardsTandil public rewards;
 
     modifier atStage(Stages _stage) {
         require(stage == _stage, 'Invalid stage');
@@ -82,8 +87,9 @@ contract Infraction  {
     // * -> REJECTED
     event rejected();
 
-    constructor(address _factory) public {
-        factory = _factory;
+    constructor(address _factory, address _rewards) public  {
+        factory = InfractionFactory(_factory);
+        rewards = RewardsTandil(_rewards);
         stage = Stages.CREATED;
     }
 
@@ -107,12 +113,12 @@ contract Infraction  {
         stage = Stages.COMMUNITY_REVIEW;
     }
 
-    function communityRejects() public atStage(Stages.COMMUNITY_REVIEW){
+    function communityRejects() public atStage(Stages.COMMUNITY_REVIEW) {
         emit rejectedByCommunity();
         stage = Stages.REJECTED_BY_COMMUNITY;
     }
 
-    function communityApproves() public atStage(Stages.COMMUNITY_REVIEW){
+    function communityApproves() public atStage(Stages.COMMUNITY_REVIEW) {
         emit approvedByComunity();
         stage = Stages.DEPARTMENT_REVIEW;
     }
@@ -127,12 +133,12 @@ contract Infraction  {
         stage = Stages.REJECTED_BY_DEPERMENT;
     }
 
-    function courtApproves() public atStage(Stages.COURT_REVIEW){
+    function courtApproves() public atStage(Stages.COURT_REVIEW) {
         emit approvedByCourt();
         stage = Stages.VOLUNTARY_PAYMENT_PERIOD;
     }
 
-    function courtRejects() public atStage(Stages.COURT_REVIEW){
+    function courtRejects() public atStage(Stages.COURT_REVIEW) {
         emit rejectedByCourt();
         stage = Stages.REJECTED_BY_COURT;
     }
@@ -157,7 +163,7 @@ contract Infraction  {
         stage = Stages.PAID;
     }
 
-    function setClaimed() public atStage(Stages.PAID){
+    function setClaimed() public atStage(Stages.PAID) {
         emit claimed();
         stage = Stages.CALIMED;
     }

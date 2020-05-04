@@ -1,23 +1,25 @@
 pragma solidity 0.6.6;
 
 import '../../../node_modules/@openzeppelin/contracts/access/Ownable.sol';
-import '../../../node_modules/@openzeppelin/contracts/access/AccessControl.sol';
 import './Infraction.sol';
+import './RewardsTandil.sol';
+import './Roles.sol';
 
-contract InfractionFactory is Ownable, AccessControl {
+contract InfractionFactory is Ownable {
     mapping(address => Infraction[]) infractionsByUser;
     mapping(address => uint) amountOfInfractionsByUser;
 
-    bytes32 public constant INSPECTOR_ROLE = keccak256("INSPECTOR_ROLE");
-
     event infractionCreated(address infractionAddress, address createdBy);
 
-    constructor() public Ownable() {
-        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+    RewardsTandil rewards;
+    constructor(address _rewardsContract) public Ownable() {
+        rewards = RewardsTandil(_rewardsContract);
     }
 
     function createInfraction() public returns(address newInfractionAddress) {
-        Infraction i = new Infraction(address(this));
+        require(address(rewards) != address(0), 'Set rewards before');
+
+        Infraction i = new Infraction(address(this), address(rewards));
 
         Infraction[] storage userInfractions = infractionsByUser[_msgSender()];
         userInfractions.push(i);
@@ -33,5 +35,9 @@ contract InfractionFactory is Ownable, AccessControl {
 
     function getAddressByUserAndIndex(address _userAddress, uint _index) public view returns(address) {
         return address(infractionsByUser[_userAddress][_index]);
+    }
+
+    function setRewardsTokenContract(address _rewardsContract) public onlyOwner() {
+        rewards = RewardsTandil(_rewardsContract);
     }
 }
