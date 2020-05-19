@@ -26,6 +26,9 @@ contract Infraction {
     Stages public stage;
     InfractionFactory public factory;
     RewardsTandil public rewards;
+    string public infractionData;
+    string public infractionVideoUrl;
+    string public infractionDomainUrl;
 
     modifier atStage(Stages _stage) {
         require(stage == _stage, 'Invalid stage');
@@ -87,10 +90,19 @@ contract Infraction {
     // * -> REJECTED
     event rejected();
 
-    constructor(address _factory, address _rewards) public  {
+    constructor(
+        address _factory, 
+        address _rewards
+        string _infractionData,
+        string _infractionVideoUrl,
+        string _infractionDomainUrl
+    ) public  {
         factory = InfractionFactory(_factory);
         rewards = RewardsTandil(_rewards);
         stage = Stages.CREATED;
+        _infractionData = _infractionData,
+        _infractionVideoUrl = _infractionVideoUrl,
+        _infractionDomainUrl = _infractionDomainUrl
     }
 
     // State Machine

@@ -16,10 +16,20 @@ contract InfractionFactory is Ownable {
         rewards = RewardsTandil(_rewardsContract);
     }
 
-    function createInfraction() public returns(address newInfractionAddress) {
+    function createInfraction(
+        string infractionData,
+        string infractionVideoUrl,
+        string infractionDomainUrl
+        ) public returns(address newInfractionAddress) {
         require(address(rewards) != address(0), 'Set rewards before');
 
-        Infraction i = new Infraction(address(this), address(rewards));
+        Infraction i = new Infraction(
+            address(this), 
+            address(rewards)
+            infractionData,
+            infractionVideoUrl,
+            infractionDomainUrl,
+        );
 
         Infraction[] storage userInfractions = infractionsByUser[_msgSender()];
         userInfractions.push(i);
