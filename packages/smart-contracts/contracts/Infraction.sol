@@ -1,4 +1,4 @@
-pragma solidity 0.6.6;
+pragma solidity 0.6.8;
 
 import '../../../node_modules/@openzeppelin/contracts/access/Ownable.sol';
 import './RewardsTandil.sol';
@@ -91,18 +91,18 @@ contract Infraction {
     event rejected();
 
     constructor(
-        address _factory, 
-        address _rewards
-        string _infractionData,
-        string _infractionVideoUrl,
-        string _infractionDomainUrl
+        address _factory,
+        address _rewards,
+        string memory _infractionData,
+        string memory _infractionVideoUrl,
+        string memory _infractionDomainUrl
     ) public  {
         factory = InfractionFactory(_factory);
         rewards = RewardsTandil(_rewards);
         stage = Stages.CREATED;
-        _infractionData = _infractionData,
-        _infractionVideoUrl = _infractionVideoUrl,
-        _infractionDomainUrl = _infractionDomainUrl
+        infractionData = _infractionData;
+        infractionVideoUrl = _infractionVideoUrl;
+        infractionDomainUrl = _infractionDomainUrl;
     }
 
     // State Machine

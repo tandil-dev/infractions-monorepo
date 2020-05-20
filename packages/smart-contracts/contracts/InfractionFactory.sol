@@ -1,4 +1,4 @@
-pragma solidity 0.6.6;
+pragma solidity 0.6.8;
 
 import '../../../node_modules/@openzeppelin/contracts/access/Ownable.sol';
 import './Infraction.sol';
@@ -17,18 +17,18 @@ contract InfractionFactory is Ownable {
     }
 
     function createInfraction(
-        string infractionData,
-        string infractionVideoUrl,
-        string infractionDomainUrl
+        string memory infractionData,
+        string memory infractionVideoUrl,
+        string memory infractionDomainUrl
         ) public returns(address newInfractionAddress) {
         require(address(rewards) != address(0), 'Set rewards before');
 
         Infraction i = new Infraction(
-            address(this), 
-            address(rewards)
+            address(this),
+            address(rewards),
             infractionData,
             infractionVideoUrl,
-            infractionDomainUrl,
+            infractionDomainUrl
         );
 
         Infraction[] storage userInfractions = infractionsByUser[_msgSender()];

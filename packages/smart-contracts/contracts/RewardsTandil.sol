@@ -1,4 +1,4 @@
-pragma solidity 0.6.6;
+pragma solidity 0.6.8;
 
 import "../../../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import './Infraction.sol';

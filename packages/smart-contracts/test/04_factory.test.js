@@ -5,6 +5,7 @@ const InfractionFactory = artifacts.require('InfractionFactory');
 const Infraction = artifacts.require('Infraction');
 const { expectEvent } = require('@openzeppelin/test-helpers');
 
+const { IPFS_HASH, VIDEO_URL, IMAGE_URL } = require('./utils');
 require('chai')
   .use(require('chai-as-promised'))
   .should();
@@ -19,7 +20,7 @@ contract('infractionFactory', ([owner, other, ...accounts]) => {
 
   describe('Infraction Factory', async () => {
     it('Create infractions', async () => {
-      const r = await infractionFactory.createInfraction();
+      const r = await infractionFactory.createInfraction(IPFS_HASH, VIDEO_URL, IMAGE_URL);
       const address = r.logs[0];
       expectEvent(r, 'infractionCreated', { createdBy: owner });
       assert.notEqual(address, '');
@@ -30,9 +31,9 @@ contract('infractionFactory', ([owner, other, ...accounts]) => {
     it('Get amount of infractions by User', async () => {
       const initialAmountOfInfractions = await infractionFactory.getAmountOfInfractionByUser(other);
       assert.equal(initialAmountOfInfractions, 0);
-      await infractionFactory.createInfraction({ from: other });
-      await infractionFactory.createInfraction({ from: other });
-      await infractionFactory.createInfraction({ from: other });
+      await infractionFactory.createInfraction(IPFS_HASH, VIDEO_URL, IMAGE_URL, { from: other });
+      await infractionFactory.createInfraction(IPFS_HASH, VIDEO_URL, IMAGE_URL, { from: other });
+      await infractionFactory.createInfraction(IPFS_HASH, VIDEO_URL, IMAGE_URL, { from: other });
       const amountOfInfractions = await infractionFactory.getAmountOfInfractionByUser(other);
       assert.equal(amountOfInfractions, 3);
     });
