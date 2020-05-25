@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "(ganache-cli > /dev/null & truffle test) && kill -9 $(lsof -ti :8545)",
+    "test": "(ganache-cli -a 20 > /dev/null & truffle test) && kill -9 $(lsof -ti :8545)",
     "deploy:local": "truffle migrate",
     "deploy:ropsten": "truffle migrate --network ropsten"
   },
