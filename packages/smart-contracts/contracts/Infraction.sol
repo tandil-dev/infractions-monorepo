@@ -4,9 +4,8 @@ import '../../../node_modules/@openzeppelin/contracts/access/Ownable.sol';
 import './RewardsTandil.sol';
 import './InfractionFactory.sol';
 
-contract Infraction {
+contract Infraction is Ownable {
     enum Stages {
-        CREATED,
         COMMUNITY_REVIEW,
         DEPARTMENT_REVIEW,
         COURT_REVIEW,
@@ -23,12 +22,17 @@ contract Infraction {
         REJECTED
     }
 
+    uint8 public requitedVotes = 3;
+
     Stages public stage;
     InfractionFactory public factory;
     RewardsTandil public rewards;
     string public infractionData;
     string public infractionVideoUrl;
     string public infractionDomainUrl;
+    address[] public saidYes;
+    address[] public saidNo;
+    mapping (address => bool) hasVoted;
 
     modifier atStage(Stages _stage) {
         require(stage == _stage, 'Invalid stage');
@@ -96,10 +100,10 @@ contract Infraction {
         string memory _infractionData,
         string memory _infractionVideoUrl,
         string memory _infractionDomainUrl
-    ) public  {
+    ) public  Ownable() {
         factory = InfractionFactory(_factory);
         rewards = RewardsTandil(_rewards);
-        stage = Stages.CREATED;
+        stage = Stages.COMMUNITY_REVIEW;
         infractionData = _infractionData;
         infractionVideoUrl = _infractionVideoUrl;
         infractionDomainUrl = _infractionDomainUrl;
@@ -109,20 +113,19 @@ contract Infraction {
 
     function addProof(string memory _url) public {
         if (stage == Stages.REJECTED_BY_COMMUNITY) {
+            requitedVotes = requitedVotes * 2 + 1; // Double votes required
             stage = Stages.COMMUNITY_REVIEW;
+            factory.addInfractionForVote();
         }
         if (stage == Stages.REJECTED_BY_DEPERMENT) {
             stage = Stages.DEPARTMENT_REVIEW;
+            factory.addInfractionForDepartmentReview();
         }
         if (stage == Stages.REJECTED_BY_COURT) {
             stage = Stages.COURT_REVIEW;
+            factory.addInfractionForJudgeReview();
         }
         emit newProof(_url);
-    }
-
-    function setReady() public atStage(Stages.CREATED) {
-        emit ready();
-        stage = Stages.COMMUNITY_REVIEW;
     }
 
     function communityRejects() public atStage(Stages.COMMUNITY_REVIEW) {
@@ -135,24 +138,29 @@ contract Infraction {
         stage = Stages.DEPARTMENT_REVIEW;
     }
 
-    function departamentApproves() public atStage(Stages.DEPARTMENT_REVIEW){
+    function departamentApproves() public atStage(Stages.DEPARTMENT_REVIEW) {
         emit approvedByDepartment();
         stage = Stages.COURT_REVIEW;
+        factory.removeInfractionForDepartmentReview();
+        factory.addInfractionForJudgeReview();
     }
 
     function departamentRejects() public atStage(Stages.DEPARTMENT_REVIEW){
         emit rejectedByDepartment();
         stage = Stages.REJECTED_BY_DEPERMENT;
+        factory.removeInfractionForDepartmentReview();
     }
 
     function courtApproves() public atStage(Stages.COURT_REVIEW) {
         emit approvedByCourt();
         stage = Stages.VOLUNTARY_PAYMENT_PERIOD;
+        factory.removeInfractionForJudgeReview();
     }
 
     function courtRejects() public atStage(Stages.COURT_REVIEW) {
         emit rejectedByCourt();
         stage = Stages.REJECTED_BY_COURT;
+        factory.removeInfractionForJudgeReview();
     }
 
     function endVolunteerPayment() public atStage(Stages.VOLUNTARY_PAYMENT_PERIOD){
@@ -183,5 +191,37 @@ contract Infraction {
     function reject() public onlyRejected() {
         emit rejected();
         stage = Stages.REJECTED;
+    }
+
+    function vote(bool _vote) public atStage(Stages.COMMUNITY_REVIEW){
+        require(!hasVoted[_msgSender()], 'Already voted');
+
+        hasVoted[_msgSender()] = true;
+        if (_vote) {
+            saidYes.push(_msgSender());
+        } else {
+            saidNo.push(_msgSender());
+        }
+        if (getTotalYes() > requitedVotes) {
+            communityApproves();
+            factory.removeInfractionForVote();
+            factory.addInfractionForDepartmentReview();
+        }
+        if (getTotalNo() > requitedVotes) {
+            communityRejects();
+            factory.removeInfractionForVote();
+        }
+    }
+
+    function getTotalYes() public view returns (uint) {
+        return saidYes.length;
+    }
+
+    function getTotalNo() public view returns (uint) {
+        return saidNo.length;
+    }
+
+    function getTotalVoters() public view returns (uint) {
+        return saidYes.length + saidNo.length;
     }
 }
