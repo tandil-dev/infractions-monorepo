@@ -1,8 +1,11 @@
+/* eslint-disable radix */
 /* eslint-env node, mocha */
 const InfractionFactory = artifacts.require('InfractionFactory');
 const { expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
 
 const { getNewInfraction } = require('./utils');
+
+const { BN } = web3.utils;
 
 require('chai')
   .use(require('chai-as-promised'))
@@ -10,15 +13,25 @@ require('chai')
 
 const url = 'https://somoeUrl.io/someJson.json';
 
-contract('Infraction', () => {
+contract('Infraction', (accounts) => {
   let infraction;
   beforeEach(async () => {
     const infractionFactory = await InfractionFactory.deployed();
     infraction = await getNewInfraction(infractionFactory);
   });
   it('Happy path =)', async () => {
-    expectEvent(await infraction.setReady(), 'ready');
-    expectEvent(await infraction.communityApproves(), 'approvedByComunity');
+    const requitedVotes = await infraction.requitedVotes();
+    const initialStage = await infraction.stage();
+
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i <= requitedVotes; i++) {
+      // eslint-disable-next-line no-await-in-loop
+      await infraction.vote(true, { from: accounts[i] });
+    }
+
+    assert.equal(initialStage.add((new BN('1'))).toString(), (await infraction.stage()).toString());
+
+    // expectEvent(await infraction.communityApproves(), 'approvedByComunity');
     expectEvent(await infraction.departamentApproves(), 'approvedByDepartment');
     expectEvent(await infraction.courtApproves(), 'approvedByCourt');
     expectEvent(await infraction.endVolunteerPayment(), 'volunteerPaimentPeriodEnds');
@@ -28,10 +41,23 @@ contract('Infraction', () => {
     expectEvent(await infraction.setClaimed(), 'claimed');
   });
   it('Happy path with rejections', async () => {
-    expectEvent(await infraction.setReady(), 'ready');
-    expectEvent(await infraction.communityRejects(), 'rejectedByCommunity');
+    const requitedVotes = await infraction.requitedVotes();
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i <= requitedVotes; i++) {
+      // eslint-disable-next-line no-await-in-loop
+      await infraction.vote(false, { from: accounts[i] });
+    }
     expectEvent(await infraction.addProof(url), 'newProof', { url });
-    expectEvent(await infraction.communityApproves(), 'approvedByComunity');
+
+    const requitedVotesSecondTime = await infraction.requitedVotes();
+    const initialSecondTime = parseInt(requitedVotes) + 1;
+    const limitSecondTime = parseInt(requitedVotes) + parseInt(requitedVotesSecondTime) + 1;
+    // eslint-disable-next-line no-plusplus
+    for (let i = initialSecondTime; i <= limitSecondTime; i++) {
+      // eslint-disable-next-line no-await-in-loop
+      await infraction.vote(true, { from: accounts[i] });
+    }
+
     expectEvent(await infraction.departamentRejects(), 'rejectedByDepartment');
     expectEvent(await infraction.addProof(url), 'newProof', { url });
     expectEvent(await infraction.departamentApproves(), 'approvedByDepartment');
@@ -47,19 +73,34 @@ contract('Infraction', () => {
 
 
   it('communityRejects', async () => {
-    await infraction.setReady();
-    expectEvent(await infraction.communityRejects(), 'rejectedByCommunity');
+    const requitedVotes = await infraction.requitedVotes();
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i <= requitedVotes; i++) {
+      // eslint-disable-next-line no-await-in-loop
+      await infraction.vote(false, { from: accounts[i] });
+    }
+
     expectEvent(await infraction.reject(), 'rejected');
   });
   it('departamentRejects', async () => {
-    await infraction.setReady();
-    await infraction.communityApproves();
+    const requitedVotes = await infraction.requitedVotes();
+
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i <= requitedVotes; i++) {
+      // eslint-disable-next-line no-await-in-loop
+      await infraction.vote(true, { from: accounts[i] });
+    }
     expectEvent(await infraction.departamentRejects(), 'rejectedByDepartment');
     expectEvent(await infraction.reject(), 'rejected');
   });
   it('courtRejects', async () => {
-    await infraction.setReady();
-    await infraction.communityApproves();
+    const requitedVotes = await infraction.requitedVotes();
+
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i <= requitedVotes; i++) {
+      // eslint-disable-next-line no-await-in-loop
+      await infraction.vote(true, { from: accounts[i] });
+    }
     await infraction.departamentApproves();
     expectEvent(await infraction.courtRejects(), 'rejectedByCourt');
     expectEvent(await infraction.reject(), 'rejected');
