@@ -32,7 +32,7 @@ contract Infraction is Ownable {
     string public infractionDomainUrl;
     address[] public saidYes;
     address[] public saidNo;
-    mapping (address => bool) hasVoted;
+    mapping (address => bool) public hasVoted;
 
     modifier atStage(Stages _stage) {
         require(stage == _stage, 'Invalid stage');

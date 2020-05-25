@@ -167,4 +167,19 @@ contract('Infraction', (accounts) => {
       infactionAddressesAfterVote.push(address);
     }
   });
+  it('Debo poder recorrer todas las infracciones disponibles para votar, ', async () => {
+    await getNewInfraction(infractionFactory);
+    await getNewInfraction(infractionFactory);
+    await getNewInfraction(infractionFactory);
+
+
+    const voter = accounts[0];
+    const address = await infractionFactory.infractionsForVote(0);
+    const infractionToVote = await Infraction.at(address);
+    let voted = await infractionToVote.hasVoted(voter);
+    assert.equal(voted, false);
+    await infractionToVote.vote(false, { from: voter });
+    voted = await infractionToVote.hasVoted(voter);
+    assert.equal(voted, true);
+  });
 });
