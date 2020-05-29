@@ -88,7 +88,7 @@ contract InfractionFactory is Ownable {
     }
 
     function getTotalInfactinsForDepartmentReview() public view returns(uint) {
-        return infractionsForVote.length;
+        return infractionsForDepartmentReview.length;
     }
 
     function removeInfractionForDepartmentReview() public {
