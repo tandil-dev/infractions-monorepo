@@ -1,12 +1,11 @@
 const Infraction = artifacts.require('Infraction');
 
-const IPFS_HASH = 'hash123';
-const VIDEO_URL = 'videoUrl';
-const IMAGE_URL = 'imageUrl';
+const DATA_HASH = 'dataHash123';
+const DOMAIN_IMAGE_HASH = 'domainImageUrl';
 
-const getNewInfraction = async (infractionFactory, ipfsHash, videoUrl, imageUrl) => {
+const getNewInfraction = async (infractionFactory, dataHash, domainImageHash) => {
   const { receipt } = await infractionFactory
-    .createInfraction(ipfsHash || IPFS_HASH, videoUrl || VIDEO_URL, imageUrl || IMAGE_URL);
+    .createInfraction(dataHash || DATA_HASH, domainImageHash || DOMAIN_IMAGE_HASH);
 
   const { infractionAddress } = receipt.logs[1].args; // logs[0] is ownable
   return Infraction.at(infractionAddress);
@@ -15,7 +14,6 @@ const getNewInfraction = async (infractionFactory, ipfsHash, videoUrl, imageUrl)
 
 module.exports = {
   getNewInfraction,
-  IPFS_HASH,
-  VIDEO_URL,
-  IMAGE_URL,
+  DATA_HASH,
+  DOMAIN_IMAGE_HASH,
 };
