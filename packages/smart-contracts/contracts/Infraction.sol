@@ -27,9 +27,8 @@ contract Infraction is Ownable {
     Stages public stage;
     InfractionFactory public factory;
     RewardsTandil public rewards;
-    string public infractionData;
-    string public infractionVideoUrl;
-    string public infractionDomainUrl;
+    string public infractionDataHash;
+    string public domainImageHash;
     address[] public saidYes;
     address[] public saidNo;
     mapping (address => bool) public hasVoted;
@@ -97,16 +96,14 @@ contract Infraction is Ownable {
     constructor(
         address _factory,
         address _rewards,
-        string memory _infractionData,
-        string memory _infractionVideoUrl,
-        string memory _infractionDomainUrl
+        string memory _infractionDataHash,
+        string memory _domainImageHash
     ) public  Ownable() {
         factory = InfractionFactory(_factory);
         rewards = RewardsTandil(_rewards);
         stage = Stages.COMMUNITY_REVIEW;
-        infractionData = _infractionData;
-        infractionVideoUrl = _infractionVideoUrl;
-        infractionDomainUrl = _infractionDomainUrl;
+        infractionDataHash = _infractionDataHash;
+        domainImageHash = _domainImageHash;
     }
 
     // State Machine

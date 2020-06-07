@@ -27,18 +27,16 @@ contract InfractionFactory is Ownable {
     }
 
     function createInfraction(
-        string memory infractionData,
-        string memory infractionVideoUrl,
-        string memory infractionDomainUrl
+        string memory infractionDataHash,
+        string memory domainImageHash
         ) public returns(address newInfractionAddress) {
         require(address(rewards) != address(0), 'Set rewards before');
 
         Infraction i = new Infraction(
             address(this),
             address(rewards),
-            infractionData,
-            infractionVideoUrl,
-            infractionDomainUrl
+            infractionDataHash,
+            domainImageHash
         );
 
         Infraction[] storage userInfractions = infractionsByUser[_msgSender()];
