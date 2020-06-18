@@ -8,11 +8,11 @@ contract RewardsTandil is ERC20 {
         _setupDecimals(1);
     }
 
-    function claimReward(address infractionAddress, uint amount) public {
-        // Check that sender == infraction owner, and change from paid to climed
+    function claimReward(address infractionAddress) public {
+        // Check that sender == infraction owner, and change from paid to claimed
         // Take special care here for reentrancy attack
-        _mint(_msgSender(), amount);
         Infraction i = Infraction(infractionAddress);
         i.setClaimed();
+        _mint(_msgSender(), i.reward());
     }
 }

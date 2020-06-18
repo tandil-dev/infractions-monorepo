@@ -10,10 +10,7 @@ contract Infraction is Ownable {
         DEPARTMENT_REVIEW,
         COURT_REVIEW,
         APPROVED_BY_COURT,
-        VOLUNTARY_PAYMENT_PERIOD,
-        REGULAR_PAYMENT_PERIOD,
-        DUE_REGULAR_PAYMENT_PERIOD,
-        EXTRA_PERIOD,
+        PAYMENT_PERIOD,
         PAID,
         CALIMED,
         REJECTED_BY_COMMUNITY,
@@ -23,6 +20,7 @@ contract Infraction is Ownable {
     }
 
     uint8 public requitedVotes = 3;
+    uint public reward;
 
     Stages public stage;
     InfractionFactory public factory;
@@ -49,11 +47,15 @@ contract Infraction is Ownable {
 
     modifier onlyIssued() {
         require(
-            stage == Stages.VOLUNTARY_PAYMENT_PERIOD ||
-            stage == Stages.REGULAR_PAYMENT_PERIOD ||
-            stage == Stages.DUE_REGULAR_PAYMENT_PERIOD ||
-            stage == Stages.EXTRA_PERIOD,
+            stage == Stages.PAYMENT_PERIOD,
             'Only issued');
+        _;
+    }
+
+    modifier onlyFromRewards() {
+        require(
+            _msgSender() == address(rewards),
+            'Only from Rewards');
         _;
     }
 
@@ -74,15 +76,6 @@ contract Infraction is Ownable {
     // COURT_REVIEW -> APPROVED_BY_COURT
     event approvedByCourt();
     event rejectedByCourt();
-
-    // APPROVED_BY_COURT -> VOLUNTARY_PAYMENT_PERIOD
-    event volunteerPaimentPeriodEnds();
-
-    // VOLUNTARY_PAYMENT_PERIOD -> PAGO_REGULAR
-    event regularPaimentPeriodEnds();
-
-    // REGULAR_PAYMENT_PERIOD-> PAGO_VENCIDO
-    event overduePaimentPeriodEnds();
 
     // * -> PAID
     event paid();
@@ -148,9 +141,10 @@ contract Infraction is Ownable {
         factory.removeInfractionForDepartmentReview();
     }
 
-    function courtApproves() public atStage(Stages.COURT_REVIEW) {
+    function courtApproves(uint _reward) public atStage(Stages.COURT_REVIEW) {
         emit approvedByCourt();
-        stage = Stages.VOLUNTARY_PAYMENT_PERIOD;
+        stage = Stages.PAYMENT_PERIOD;
+        reward = _reward;
         factory.removeInfractionForJudgeReview();
     }
 
@@ -160,27 +154,12 @@ contract Infraction is Ownable {
         factory.removeInfractionForJudgeReview();
     }
 
-    function endVolunteerPayment() public atStage(Stages.VOLUNTARY_PAYMENT_PERIOD){
-        emit volunteerPaimentPeriodEnds();
-        stage = Stages.REGULAR_PAYMENT_PERIOD;
-    }
-
-    function endRegularPayment() public atStage(Stages.REGULAR_PAYMENT_PERIOD){
-        emit regularPaimentPeriodEnds();
-        stage = Stages.DUE_REGULAR_PAYMENT_PERIOD;
-    }
-
-    function endOverduePayment() public atStage(Stages.DUE_REGULAR_PAYMENT_PERIOD){
-        emit overduePaimentPeriodEnds();
-        stage = Stages.EXTRA_PERIOD;
-    }
-
     function setPaid() public onlyIssued() {
         emit paid();
         stage = Stages.PAID;
     }
 
-    function setClaimed() public atStage(Stages.PAID) {
+    function setClaimed() public atStage(Stages.PAID) onlyFromRewards() {
         emit claimed();
         stage = Stages.CALIMED;
     }

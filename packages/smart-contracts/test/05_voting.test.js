@@ -59,7 +59,7 @@ contract('Infraction', (accounts) => {
     assert.equal(infractionAddressInFactoy, infraction.address);
   });
 
-  it('Al cambiar de estado, la infrcción debe ser removida de la lista de infracciones para votar', async () => {
+  it('Al cambiar de estado, la infracción debe ser removida de la lista de infracciones para votar', async () => {
     const requitedVotes = await infraction.requitedVotes();
     const initialStage = await infraction.stage();
     assert.equal(initialStage, 0);
@@ -74,7 +74,7 @@ contract('Infraction', (accounts) => {
       await infraction.vote(false, { from: accounts[i] });
     }
 
-    assert.equal(await infraction.stage(), 10);
+    assert.equal(await infraction.stage(), 7);
   });
 
   it('Al llegar a N votos positivos, debe cambiar de estado', async () => {
@@ -90,7 +90,7 @@ contract('Infraction', (accounts) => {
     assert.equal(initialStage.add((new BN('1'))).toString(), (await infraction.stage()).toString());
   });
 
-  it('Al llegar a N votos negativos, debe cambiar al estado REJECTED_BY_COMMUNITY (10)', async () => {
+  it('Al llegar a N votos negativos, debe cambiar al estado REJECTED_BY_COMMUNITY (7)', async () => {
     const requitedVotes = await infraction.requitedVotes();
     const initialStage = await infraction.stage();
     assert.equal(initialStage, 0);
@@ -100,7 +100,7 @@ contract('Infraction', (accounts) => {
       await infraction.vote(false, { from: accounts[i] });
     }
 
-    assert.equal(await infraction.stage(), 10);
+    assert.equal(await infraction.stage(), 7);
   });
 
   it('Tomar la primer infracción votarla por todos. Debe actulizar los indices', async () => {

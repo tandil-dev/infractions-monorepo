@@ -31,14 +31,9 @@ contract('Infraction', (accounts) => {
 
     assert.equal(initialStage.add((new BN('1'))).toString(), (await infraction.stage()).toString());
 
-    // expectEvent(await infraction.communityApproves(), 'approvedByComunity');
     expectEvent(await infraction.departamentApproves(), 'approvedByDepartment');
-    expectEvent(await infraction.courtApproves(), 'approvedByCourt');
-    expectEvent(await infraction.endVolunteerPayment(), 'volunteerPaimentPeriodEnds');
-    expectEvent(await infraction.endRegularPayment(), 'regularPaimentPeriodEnds');
-    expectEvent(await infraction.endOverduePayment(), 'overduePaimentPeriodEnds');
+    expectEvent(await infraction.courtApproves(30), 'approvedByCourt');
     expectEvent(await infraction.setPaid(), 'paid');
-    expectEvent(await infraction.setClaimed(), 'claimed');
   });
   it('Happy path with rejections', async () => {
     const requitedVotes = await infraction.requitedVotes();
@@ -63,12 +58,8 @@ contract('Infraction', (accounts) => {
     expectEvent(await infraction.departamentApproves(), 'approvedByDepartment');
     expectEvent(await infraction.courtRejects(), 'rejectedByCourt');
     expectEvent(await infraction.addProof(url), 'newProof', { url });
-    expectEvent(await infraction.courtApproves(), 'approvedByCourt');
-    expectEvent(await infraction.endVolunteerPayment(), 'volunteerPaimentPeriodEnds');
-    expectEvent(await infraction.endRegularPayment(), 'regularPaimentPeriodEnds');
-    expectEvent(await infraction.endOverduePayment(), 'overduePaimentPeriodEnds');
+    expectEvent(await infraction.courtApproves(30), 'approvedByCourt');
     expectEvent(await infraction.setPaid(), 'paid');
-    expectEvent(await infraction.setClaimed(), 'claimed');
   });
 
 
