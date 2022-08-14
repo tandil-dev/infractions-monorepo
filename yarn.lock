@@ -459,10 +459,10 @@
     fs-extra "^8.1.0"
     try-require "^1.2.1"
 
-"@openzeppelin/contracts@3.0.0-rc.1":
-  version "3.0.0-rc.1"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-3.0.0-rc.1.tgz#83137fa429f6cbfa5fc66a9cddd7b5f1c054b36e"
-  integrity sha512-ltTR/wlkQvVL1ucenP9mSXGTIBlyHHwST7sM9X1lTvf6HwtdC/TJ/phukfni++RgN+Qsl7Aoa7rhvTMB6dAquA==
+"@openzeppelin/contracts@4.7.2":
+  version "4.7.2"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.7.2.tgz#7587416fe2d35abf574193515b8971bfe9f64bc7"
+  integrity sha512-4n/JL9izql8303mPqPdubuna/DWEMbmOzWYUWyCPhjhiEr2w3nQrjE7vZz1fBF+wzzP6dZbIcsgqACk53c9FGA==
 
 "@openzeppelin/test-helpers@^0.5.5":
   version "0.5.5"
